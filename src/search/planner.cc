@@ -15,7 +15,8 @@ using utils::ExitCode;
 int main(int argc, const char **argv) {
     utils::register_event_handlers();
 
-    if (argc < 2) {
+    if (argc < 2)
+    {
         utils::g_log << usage(argv[0]) << endl;
         utils::exit_with(ExitCode::SEARCH_INPUT_ERROR);
     }
@@ -30,7 +31,6 @@ int main(int argc, const char **argv) {
     }
 
     shared_ptr<SearchEngine> engine = parse_cmd_line(argc, argv, unit_cost);
-
 
     utils::Timer search_timer;
     engine->search();
