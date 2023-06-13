@@ -84,6 +84,7 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
     string plan_filename = "sas_plan";
     int num_previously_generated_plans = 0;
     bool is_part_of_anytime_portfolio = false;
+    int print_traces = 0;
 
     using SearchPtr = shared_ptr<SearchEngine>;
     SearchPtr engine = nullptr;
@@ -149,7 +150,11 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
             num_previously_generated_plans = parse_int_arg(arg, args[i]);
             if (num_previously_generated_plans < 0)
                 input_error("argument for --internal-previous-portfolio-plans must be positive");
-        } else {
+        } else if (arg == "--print-traces") {
+            ++i;
+            print_traces = stoi(args[i]);
+        }
+        else {
             input_error("unknown option " + arg);
         }
     }
@@ -159,6 +164,8 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
         plan_manager.set_plan_filename(plan_filename);
         plan_manager.set_num_previously_generated_plans(num_previously_generated_plans);
         plan_manager.set_is_part_of_anytime_portfolio(is_part_of_anytime_portfolio);
+        if(print_traces != 0)
+            engine->to_print_traces = print_traces;
     }
     return engine;
 }
@@ -176,7 +183,8 @@ shared_ptr<SearchEngine> parse_cmd_line(
             active = !is_unit_cost;
         } else if (arg == "--always") {
             active = true;
-        } else if (active) {
+        } 
+        else if (active) {
             args.push_back(arg);
         }
     }

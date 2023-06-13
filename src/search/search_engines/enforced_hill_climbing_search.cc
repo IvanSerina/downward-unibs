@@ -142,6 +142,12 @@ void EnforcedHillClimbingSearch::insert_successor_into_open_list(
     EvaluationContext new_eval_context(
         eval_context, succ_g, preferred, &statistics);
     open_list->insert(new_eval_context, entry);
+
+    // test stampa tracce
+    if(to_print_traces > 0) 
+        print_traces(eval_context.get_state());
+
+
     statistics.inc_generated_ops();
 }
 
@@ -186,6 +192,7 @@ SearchStatus EnforcedHillClimbingSearch::step() {
     search_progress.check_progress(current_eval_context);
 
     if (check_goal_and_set_plan(current_eval_context.get_state())) {
+        cout << "---> open list size: " << &open_list << endl;
         return SOLVED;
     }
 

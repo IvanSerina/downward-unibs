@@ -119,7 +119,8 @@ void dump_pddl(const State &state) {
     for (FactProxy fact : state) {
         string fact_name = fact.get_name();
         if (fact_name != "<none of those>")
-            utils::g_log << fact_name << endl;
+            //utils::g_log << fact_name << endl;
+            cout << fact_name << endl;
     }
 }
 

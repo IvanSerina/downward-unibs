@@ -14,6 +14,8 @@
 #include <limits>
 #include <vector>
 
+#include <list>
+
 using namespace std;
 
 namespace lazy_search {
@@ -111,6 +113,11 @@ void LazySearch::generate_successors() {
             EvaluationContext new_eval_context(
                 current_eval_context, new_g, is_preferred, nullptr);
             open_list->insert(new_eval_context, make_pair(current_state.get_id(), op_id));
+
+            // test stampa tracce
+            if(to_print_traces > 0)
+                print_traces(current_state);
+            
         }
     }
 }
@@ -155,8 +162,8 @@ SearchStatus LazySearch::step() {
     // - current_g is the g value of the current state according to the cost_type
     // - current_real_g is the g value of the current state (using real costs)
 
-
     SearchNode node = search_space.get_node(current_state);
+    
     bool reopen = reopen_closed_nodes && !node.is_new() &&
         !node.is_dead_end() && (current_g < node.get_g());
 
@@ -189,8 +196,11 @@ SearchStatus LazySearch::step() {
                 }
             }
             node.close();
-            if (check_goal_and_set_plan(current_state))
-                return SOLVED;
+            if (check_goal_and_set_plan(current_state)) {
+                // CHECK OPEN LIST DOPO RISOLUZIONE
+                //cout << "-----> OPEN LIST SIZE: " << open_list << endl;
+                //return SOLVED;
+            }
             if (search_progress.check_progress(current_eval_context)) {
                 statistics.print_checkpoint_line(current_g);
                 reward_progress();
@@ -216,4 +226,5 @@ void LazySearch::print_statistics() const {
     statistics.print_detailed_statistics();
     search_space.print_statistics();
 }
+
 }

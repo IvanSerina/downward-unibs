@@ -155,6 +155,10 @@ SearchStatus EagerSearch::step() {
                 }
                 if (new_h != old_h) {
                     open_list->insert(eval_context, id);
+                    // test stampa tracce
+                    if(to_print_traces > 0) 
+                        print_traces(state_registry.lookup_state(id));
+
                     continue;
                 }
             }
@@ -229,6 +233,11 @@ SearchStatus EagerSearch::step() {
             succ_node.open(*node, op, get_adjusted_cost(op));
 
             open_list->insert(succ_eval_context, succ_state.get_id());
+            // test stampa tracce
+            if(to_print_traces > 0) 
+                print_traces(succ_state);
+
+
             if (search_progress.check_progress(succ_eval_context)) {
                 statistics.print_checkpoint_line(succ_node.get_g());
                 reward_progress();
@@ -269,6 +278,11 @@ SearchStatus EagerSearch::step() {
                   from scratch.
                 */
                 open_list->insert(succ_eval_context, succ_state.get_id());
+
+                // test stampa tracce
+                if(to_print_traces > 0)
+                    print_traces(succ_state);
+
             } else {
                 // If we do not reopen closed nodes, we just update the parent pointers.
                 // Note that this could cause an incompatibility between

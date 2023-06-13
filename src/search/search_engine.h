@@ -40,12 +40,11 @@ protected:
     const std::shared_ptr<AbstractTask> task;
     // Use task_proxy to access task information.
     TaskProxy task_proxy;
-
+    SearchSpace search_space;
     mutable utils::LogProxy log;
     PlanManager plan_manager;
     StateRegistry state_registry;
     const successor_generator::SuccessorGenerator &successor_generator;
-    SearchSpace search_space;
     SearchProgress search_progress;
     SearchStatistics statistics;
     int bound;
@@ -60,6 +59,7 @@ protected:
     bool check_goal_and_set_plan(const State &state);
     int get_adjusted_cost(const OperatorProxy &op) const;
 public:
+
     SearchEngine(const plugins::Options &opts);
     virtual ~SearchEngine();
     virtual void print_statistics() const = 0;
@@ -79,6 +79,11 @@ public:
     static void add_pruning_option(plugins::Feature &feature);
     static void add_options_to_feature(plugins::Feature &feature);
     static void add_succ_order_options(plugins::Feature &feature);
+
+    // for printing traces of the states, from the initial state to the goal state
+    int to_print_traces = 0;
+    void print_traces(State state);
+    int current_state_trace = -1;
 };
 
 /*

@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include <limits>
 
 using namespace std;
@@ -23,7 +24,8 @@ using utils::ExitCode;
 class PruningMethod;
 
 successor_generator::SuccessorGenerator &get_successor_generator(
-    const TaskProxy &task_proxy, utils::LogProxy &log) {
+    const TaskProxy &task_proxy, utils::LogProxy &log)
+{
     log << "Building successor generator..." << flush;
     int peak_memory_before = utils::get_peak_memory_in_kb();
     utils::Timer successor_generator_timer;
@@ -53,8 +55,10 @@ SearchEngine::SearchEngine(const plugins::Options &opts)
       statistics(log),
       cost_type(opts.get<OperatorCost>("cost_type")),
       is_unit_cost(task_properties::is_unit_cost(task_proxy)),
-      max_time(opts.get<double>("max_time")) {
-    if (opts.get<int>("bound") < 0) {
+      max_time(opts.get<double>("max_time"))
+{
+    if (opts.get<int>("bound") < 0)
+    {
         cerr << "error: negative cost bound " << opts.get<int>("bound") << endl;
         utils::exit_with(ExitCode::SEARCH_INPUT_ERROR);
     }
@@ -62,44 +66,55 @@ SearchEngine::SearchEngine(const plugins::Options &opts)
     task_properties::print_variable_statistics(task_proxy);
 }
 
-SearchEngine::~SearchEngine() {
+SearchEngine::~SearchEngine()
+{
 }
 
-bool SearchEngine::found_solution() const {
+bool SearchEngine::found_solution() const
+{
     return solution_found;
 }
 
-SearchStatus SearchEngine::get_status() const {
+SearchStatus SearchEngine::get_status() const
+{
     return status;
 }
 
-const Plan &SearchEngine::get_plan() const {
+const Plan &SearchEngine::get_plan() const
+{
     assert(solution_found);
     return plan;
 }
 
-void SearchEngine::set_plan(const Plan &p) {
+void SearchEngine::set_plan(const Plan &p)
+{
     solution_found = true;
     plan = p;
 }
 
-void SearchEngine::search() {
+void SearchEngine::search()
+{
     initialize();
     utils::CountdownTimer timer(max_time);
-    while (status == IN_PROGRESS) {
+    while (status == IN_PROGRESS)
+    {
         status = step();
-        if (timer.is_expired()) {
+        if (timer.is_expired())
+        {
             log << "Time limit reached. Abort search." << endl;
             status = TIMEOUT;
             break;
         }
     }
+
     // TODO: Revise when and which search times are logged.
     log << "Actual search time: " << timer.get_elapsed_time() << endl;
 }
 
-bool SearchEngine::check_goal_and_set_plan(const State &state) {
-    if (task_properties::is_goal_state(task_proxy, state)) {
+bool SearchEngine::check_goal_and_set_plan(const State &state)
+{
+    if (task_properties::is_goal_state(task_proxy, state))
+    {
         log << "Solution found!" << endl;
         Plan plan;
         search_space.trace_path(state, plan);
@@ -109,13 +124,16 @@ bool SearchEngine::check_goal_and_set_plan(const State &state) {
     return false;
 }
 
-void SearchEngine::save_plan_if_necessary() {
-    if (found_solution()) {
+void SearchEngine::save_plan_if_necessary()
+{
+    if (found_solution())
+    {
         plan_manager.save_plan(get_plan(), task_proxy);
     }
 }
 
-int SearchEngine::get_adjusted_cost(const OperatorProxy &op) const {
+int SearchEngine::get_adjusted_cost(const OperatorProxy &op) const
+{
     return get_adjusted_action_cost(op, cost_type, is_unit_cost);
 }
 
@@ -124,8 +142,9 @@ int SearchEngine::get_adjusted_cost(const OperatorProxy &op) const {
 
    Method doesn't belong here because it's only useful for certain derived classes.
    TODO: Figure out where it belongs and move it there. */
-void SearchEngine::add_pruning_option(plugins::Feature &feature) {
-    feature.add_option<shared_ptr<PruningMethod>>(
+void SearchEngine::add_pruning_option(plugins::Feature &feature)
+{
+    feature.add_option<shared_ptr<PruningMethod> >(
         "pruning",
         "Pruning methods can prune or reorder the set of applicable operators in "
         "each state and thereby influence the number and order of successor states "
@@ -133,12 +152,14 @@ void SearchEngine::add_pruning_option(plugins::Feature &feature) {
         "null()");
 }
 
-void SearchEngine::add_options_to_feature(plugins::Feature &feature) {
+void SearchEngine::add_options_to_feature(plugins::Feature &feature)
+{
     ::add_cost_type_option_to_feature(feature);
     feature.add_option<int>(
         "bound",
         "exclusive depth bound on g-values. Cutoffs are always performed according to "
-        "the real cost, regardless of the cost_type parameter", "infinity");
+        "the real cost, regardless of the cost_type parameter",
+        "infinity");
     feature.add_option<double>(
         "max_time",
         "maximum time in seconds the search is allowed to run for. The "
@@ -153,7 +174,8 @@ void SearchEngine::add_options_to_feature(plugins::Feature &feature) {
 
 /* Method doesn't belong here because it's only useful for certain derived classes.
    TODO: Figure out where it belongs and move it there. */
-void SearchEngine::add_succ_order_options(plugins::Feature &feature) {
+void SearchEngine::add_succ_order_options(plugins::Feature &feature)
+{
     vector<string> options;
     feature.add_option<bool>(
         "randomize_successors",
@@ -172,32 +194,73 @@ void SearchEngine::add_succ_order_options(plugins::Feature &feature) {
 }
 
 void print_initial_evaluator_values(
-    const EvaluationContext &eval_context) {
+    const EvaluationContext &eval_context)
+{
     eval_context.get_cache().for_each_evaluator_result(
-        [] (const Evaluator *eval, const EvaluationResult &result) {
-            if (eval->is_used_for_reporting_minima()) {
+        [](const Evaluator *eval, const EvaluationResult &result)
+        {
+            if (eval->is_used_for_reporting_minima())
+            {
                 eval->report_value_for_initial_state(result);
             }
-        }
-        );
+        });
 }
 
-static class SearchEngineCategoryPlugin : public plugins::TypedCategoryPlugin<SearchEngine> {
+static class SearchEngineCategoryPlugin : public plugins::TypedCategoryPlugin<SearchEngine>
+{
 public:
-    SearchEngineCategoryPlugin() : TypedCategoryPlugin("SearchEngine") {
+    SearchEngineCategoryPlugin() : TypedCategoryPlugin("SearchEngine")
+    {
         // TODO: Replace add synopsis for the wiki page.
         // document_synopsis("...");
     }
-}
-_category_plugin;
+} _category_plugin;
 
 void collect_preferred_operators(
     EvaluationContext &eval_context,
     Evaluator *preferred_operator_evaluator,
-    ordered_set::OrderedSet<OperatorID> &preferred_operators) {
-    if (!eval_context.is_evaluator_value_infinite(preferred_operator_evaluator)) {
-        for (OperatorID op_id : eval_context.get_preferred_operators(preferred_operator_evaluator)) {
+    ordered_set::OrderedSet<OperatorID> &preferred_operators)
+{
+    if (!eval_context.is_evaluator_value_infinite(preferred_operator_evaluator))
+    {
+        for (OperatorID op_id : eval_context.get_preferred_operators(preferred_operator_evaluator))
+        {
             preferred_operators.insert(op_id);
         }
+    }
+}
+
+
+// print the traces of plan from the initial state to the current state
+void SearchEngine::print_traces(State state)
+{
+    ofstream plan_file;
+
+    if (current_state_trace == -1)
+        plan_file.open("traces");
+    else
+        plan_file.open("traces", std::ios_base::app);
+
+    if (state.get_id().get_value() > current_state_trace)
+    {
+        Plan plan;
+        search_space.trace_path(state, plan);
+        plan_file << "State " << state.get_id() << endl;
+        for (FactProxy fact : state)
+        {
+            string fact_name = fact.get_name();
+            if (fact_name != "<none of those>")
+                plan_file << fact_name << endl;
+        }
+        plan_file << "Plan: " << endl;
+
+        OperatorsProxy operators = task_proxy.get_operators();
+
+        for (OperatorID op_id : plan)
+            plan_file << operators[op_id].get_name() << " (" << operators[op_id].get_cost() << ")" << endl;
+
+        plan_file << endl;
+        current_state_trace++;
+        to_print_traces--;
     }
 }
