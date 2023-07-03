@@ -85,6 +85,7 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
     int num_previously_generated_plans = 0;
     bool is_part_of_anytime_portfolio = false;
     int print_traces = 0;
+    int print_expanded = 0;
 
     using SearchPtr = shared_ptr<SearchEngine>;
     SearchPtr engine = nullptr;
@@ -153,6 +154,9 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
         } else if (arg == "--print-traces") {
             ++i;
             print_traces = stoi(args[i]);
+        } else if (arg == "--print-expanded") {
+            ++i;
+            print_expanded = stoi(args[i]);
         }
         else {
             input_error("unknown option " + arg);
@@ -166,6 +170,8 @@ static shared_ptr<SearchEngine> parse_cmd_line_aux(const vector<string> &args) {
         plan_manager.set_is_part_of_anytime_portfolio(is_part_of_anytime_portfolio);
         if(print_traces != 0)
             engine->to_print_traces = print_traces;
+        if(print_expanded)
+            engine->to_print_expanded = print_expanded;
     }
     return engine;
 }

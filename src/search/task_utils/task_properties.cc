@@ -127,8 +127,11 @@ void dump_pddl(const State &state) {
 void dump_fdr(const State &state) {
     for (FactProxy fact : state) {
         VariableProxy var = fact.get_variable();
-        utils::g_log << "  #" << var.get_id() << " [" << var.get_name() << "] -> "
+        //utils::g_log << "  #" << var.get_id() << " [" << var.get_name() << "] -> "
+        //             << fact.get_value() << endl;
+        cout << "  #" << var.get_id() << " [" << var.get_name() << "] -> "
                      << fact.get_value() << endl;
+    
     }
 }
 

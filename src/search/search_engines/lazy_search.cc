@@ -160,10 +160,10 @@ SearchStatus LazySearch::step() {
     // - current_predecessor is a permanent pointer to the predecessor of that state.
     // - current_operator is the operator which leads to current_state from predecessor.
     // - current_g is the g value of the current state according to the cost_type
-    // - current_real_g is the g value of the current state (using real costs)
-
-    SearchNode node = search_space.get_node(current_state);
+    // - current_real_g is the g value of the current state (using real costs)    
     
+    SearchNode node = search_space.get_node(current_state);
+
     bool reopen = reopen_closed_nodes && !node.is_new() &&
         !node.is_dead_end() && (current_g < node.get_g());
 
@@ -198,8 +198,8 @@ SearchStatus LazySearch::step() {
             node.close();
             if (check_goal_and_set_plan(current_state)) {
                 // CHECK OPEN LIST DOPO RISOLUZIONE
-                //cout << "-----> OPEN LIST SIZE: " << open_list << endl;
-                //return SOLVED;
+                // cout << "-----> OPEN LIST SIZE: " << open_list << endl;
+                // return SOLVED;
             }
             if (search_progress.check_progress(current_eval_context)) {
                 statistics.print_checkpoint_line(current_g);
@@ -215,6 +215,12 @@ SearchStatus LazySearch::step() {
             print_initial_evaluator_values(current_eval_context);
         }
     }
+
+    if(to_print_expanded > 0) {
+        node.dump_screen(task_proxy);
+        to_print_expanded--;
+    }
+
     return fetch_next_state();
 }
 

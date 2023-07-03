@@ -1,0 +1,7 @@
+State #0
+Atom fuel-level(plane1, fl2)
+Atom at(plane1, city0)
+Atom at(person3, city2)
+Atom at(person1, city2)
+Plan: 
+

@@ -53,8 +53,6 @@ public:
     void set_preferred_operator_evaluators(std::vector<std::shared_ptr<Evaluator>> &evaluators);
 
     virtual void print_statistics() const override;
-
-    //void print_traces(State state);
 };
 }
 

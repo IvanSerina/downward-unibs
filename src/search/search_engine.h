@@ -82,7 +82,9 @@ public:
 
     // for printing traces of the states, from the initial state to the goal state
     int to_print_traces = 0;
+    int to_print_expanded = 0;
     void print_traces(State state);
+
     int current_state_trace = -1;
 };
 
