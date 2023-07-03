@@ -96,8 +96,12 @@ void SearchEngine::search()
 {
     initialize();
     utils::CountdownTimer timer(max_time);
+    cout << "Starting search\n" << endl;
+    int i = 0;
     while (status == IN_PROGRESS)
-    {
+    {   
+        if(to_print_expanded)
+            cout << "Step #" << ++i << endl;
         status = step();
         if (timer.is_expired())
         {
